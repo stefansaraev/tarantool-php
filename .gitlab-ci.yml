@@ -1,0 +1,66 @@
+stages:
+  - build
+  - deploy
+
+.build:
+  script:
+    - apt-get update
+    - apt-get -y install debhelper php$PHP-dev pkg-config cdbs
+    - ./make_debian_changelog.sh $PHP
+    - dpkg-buildpackage -us -uc
+    - mkdir -p build
+    - mv ../php$PHP-tarantool_*.deb build/
+  artifacts:
+    paths:
+      - build/*
+
+.deploy:
+  script:
+    - reprepro -b /var/www/html/repository/ includedeb $REPO build/php$PHP-tarantool_*.deb
+  tags:
+    - deploy
+
+build-deb9:
+  stage: build
+  extends: .build
+  variables:
+    PHP: "7.0"
+  tags:
+    - debian9-build
+
+deploy-deb9:
+  stage: deploy
+  extends: .deploy
+  variables:
+    PHP: "7.0"
+    REPO: "stretch"
+
+build-deb10:
+  stage: build
+  extends: .build
+  variables:
+    PHP: "7.3"
+  tags:
+    - debian10-build
+
+deploy-deb10:
+  stage: deploy
+  extends: .deploy
+  variables:
+    PHP: "7.3"
+    REPO: "buster"
+
+build:deb11:
+  stage: build
+  extends: .build
+  variables:
+    PHP: "7.4"
+  tags:
+    - debian11-build
+
+deploy:deb11:
+  stage: deploy
+  extends: .deploy
+  variables:
+    PHP: "7.4"
+    REPO: "bullseye"
