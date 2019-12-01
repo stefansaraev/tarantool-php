@@ -1070,10 +1070,10 @@ PHP_METHOD(Tarantool, __construct) {
 		suffix_or_port = &suffix_or_port_default;
 	}
 
-	if (strstr(host, "tcp://" ) != 0 ||
+	if (host != NULL && (strstr(host, "tcp://" ) != 0 ||
 	    strstr(host, "unix://") != 0 ||
 	    strstr(host, "unix/:" ) != 0 ||
-	    Z_TYPE_P(suffix_or_port) == IS_STRING) {
+	    Z_TYPE_P(suffix_or_port) == IS_STRING)) {
 		url = estrdup(host);
 		url_len = host_len;
 
